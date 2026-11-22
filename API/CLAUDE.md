@@ -12,8 +12,6 @@ API/
 ├── README.md                   # Human-facing docs
 ├── Dockerfile                  # Multi-stage build (sdk:10.0 -> aspnet:10.0, non-root, port 8080)
 ├── .dockerignore               # Keeps bin/obj/.vs/.git/tests out of the build context
-├── docker-compose.yml          # API + SQL Server; injects ConnectionStrings__Default
-├── .env.example                # Template for SA_PASSWORD (copy to .env, git-ignored)
 ├── .gitignore                  # Backend ignores: bin/, obj/, .vs/, *.user, .env
 └── Lab-01/
     ├── Program.cs              # DI, CORS, migrate-on-startup, minimal-API endpoints
@@ -64,10 +62,13 @@ dotnet ef migrations add <Name> --project Lab-01   # new migration
 The default `dotnet run` uses the `http` profile (port 5184). The `https` profile
 (7287) also exists but requires a trusted dev cert; the UI is wired to the http port.
 
-## Docker (run from `API/`)
+## Docker
+
+Compose lives at the **repository root** (`../docker-compose.yml`) because it orchestrates
+the whole stack (API + SQL Server, and later the UI). Run it from the root:
 
 ```bash
-cp .env.example .env            # then set a strong SA_PASSWORD
+cp .env.example .env            # at the repo root; set a strong SA_PASSWORD
 docker compose up --build       # API on http://localhost:5184, SQL Server on 1433
 ```
 
@@ -75,4 +76,5 @@ docker compose up --build       # API on http://localhost:5184, SQL Server on 14
   **5184** so the Angular UI's `API_BASE` keeps working unchanged.
 - `ConnectionStrings__Default` is injected by compose (service `db`) — never baked into
   the image. The API migrates on startup once the DB is healthy.
-- Build the image alone: `docker build -t tasktracker-api .` (context is `API/`).
+- Build the API image alone (context is `API/`): `docker build -t todo-api ./API`
+  from the root, or `docker build -t todo-api .` from inside `API/`.

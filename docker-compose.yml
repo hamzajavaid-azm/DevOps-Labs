@@ -1,10 +1,13 @@
-# Runs the Todo API together with a SQL Server instance.
+# Runs the Todo stack with Docker Compose. Run from the repository ROOT:
 #
 #   docker compose up --build
 #
 # Copy .env.example to .env and set SA_PASSWORD first. The API applies its EF Core
 # migrations on startup (with retries), so the schema is created automatically once
 # the database is reachable.
+#
+# The Angular frontend (UI-Angular) can be added as another service later — see the
+# commented "web" block at the bottom.
 
 services:
   db:
@@ -17,8 +20,7 @@ services:
     volumes:
       - mssql-data:/var/opt/mssql
     healthcheck:
-      # The API's migrate-on-startup retry loop also covers DB readiness, but this
-      # lets compose hold the API back until SQL Server is actually accepting logins.
+      # Holds the API back until SQL Server is actually accepting logins.
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" || exit 1"]
       interval: 10s
       timeout: 5s
@@ -27,12 +29,13 @@ services:
 
   api:
     build:
-      context: .
+      # Build context is the API/ folder; its Dockerfile lives there.
+      context: ./API
       dockerfile: Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
       # Connection string is injected at runtime (never hard-coded in the app).
-      # "db" is this compose service name, resolved on the compose network.
+      # "db" is the compose service name, resolved on the compose network.
       ConnectionStrings__Default: "Server=db,1433;Database=TodoDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
     ports:
       # Host 5184 -> container 8080, so the Angular UI's API_BASE keeps working.
@@ -40,6 +43,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # --- Frontend (add later) ---
+  # Once UI-Angular has its own Dockerfile (e.g. nginx serving the built app),
+  # uncomment this to run the whole stack with one `docker compose up`.
+  #
+  # web:
+  #   build:
+  #     context: ./UI-Angular
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "4200:80"
+  #   depends_on:
+  #     - api
 
 volumes:
   mssql-data:

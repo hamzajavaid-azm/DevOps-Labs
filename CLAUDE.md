@@ -49,6 +49,22 @@ truth is `API/Lab-01/Data/TaskItem.cs`.
 2. **UI** — from `UI-Angular/`: `npm install` then `npm start` (serves http://localhost:4200).
 3. Open http://localhost:4200. The API must be running or the UI shows a load error.
 
+### With Docker (API + SQL Server)
+
+`docker-compose.yml` lives **at this root** and orchestrates the whole stack. From the
+repo root:
+
+```bash
+cp .env.example .env     # set a strong SA_PASSWORD
+docker compose up --build
+```
+
+- `db` — SQL Server 2022 (data persists in the `mssql-data` volume).
+- `api` — built from `API/Dockerfile`, served on http://localhost:5184.
+- The Angular UI will be added as a `web` service later (there's a commented stub in the
+  compose file). For now run the UI with `npm start` as above.
+- `.env` / `.env.example` also live at the root (that's where compose reads them).
+
 ## Conventions
 
 - Keep the API contract above in sync across `TaskItem.cs` and `task.model.ts`.
