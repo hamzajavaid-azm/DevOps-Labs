@@ -1,0 +1,43 @@
+@Lab_01_HostAddress = http://localhost:5184
+
+### Existing weather forecast endpoint
+GET {{Lab_01_HostAddress}}/weatherforecast/
+Accept: application/json
+
+### Liveness check
+GET {{Lab_01_HostAddress}}/health
+Accept: application/json
+
+### Database readiness check (200 healthy / 503 if DB unreachable)
+GET {{Lab_01_HostAddress}}/health/db
+Accept: application/json
+
+### List all tasks
+GET {{Lab_01_HostAddress}}/api/tasks
+Accept: application/json
+
+### Get one task by id
+GET {{Lab_01_HostAddress}}/api/tasks/1
+Accept: application/json
+
+### Create a task (valid)
+POST {{Lab_01_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Learn Docker"
+}
+
+### Create a task (invalid - empty title, returns 400)
+POST {{Lab_01_HostAddress}}/api/tasks
+Content-Type: application/json
+
+{
+  "title": ""
+}
+
+### Mark task 1 as done
+PUT {{Lab_01_HostAddress}}/api/tasks/1/done
+Accept: application/json
+
+###

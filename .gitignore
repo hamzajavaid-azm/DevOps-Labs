@@ -1,0 +1,24 @@
+# Root .gitignore — common/shared ignores for the whole monorepo.
+# Stack-specific ignores live in each folder:
+#   API/.gitignore         -> bin/, obj/, .vs/, *.user, .env
+#   UI-Angular/.gitignore  -> node_modules/, dist/, .angular/, etc.
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE (shared)
+.idea/
+*.swp
+*~
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & temp
+*.log
+/tmp/
+/scratch/
