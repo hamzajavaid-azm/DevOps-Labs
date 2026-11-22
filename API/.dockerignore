@@ -1,0 +1,27 @@
+# Keep the Docker build context small and avoid cache busting.
+# Paths are relative to the build context (the API/ folder).
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Visual Studio / IDE
+**/.vs/
+**/*.user
+
+# Git
+.git/
+.gitignore
+
+# Secrets — never bake these into an image
+**/.env
+
+# Docs & docker files (not needed inside the image)
+**/CLAUDE.md
+README.md
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Test project — not part of the runtime image
+tests/
