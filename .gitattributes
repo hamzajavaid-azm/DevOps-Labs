@@ -1,0 +1,12 @@
+# Normalize line endings. Keep files that are parsed literally as LF so a Windows
+# CRLF checkout can't inject a trailing '\r' (notably into .env values, which breaks
+# the SQL Server sa password).
+* text=auto
+
+.env            text eol=lf
+.env.example    text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+.dockerignore   text eol=lf
