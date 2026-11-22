@@ -66,3 +66,34 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.ref_name }}      
+ 
+  deploy:
+    name: Deploy API to Local Ubuntu
+    runs-on: self-hosted
+    needs: docker
+    environment: development
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Write appsettings.Production.json from Secret
+        run: |
+          mkdir -p ~/todo-api/config
+          cat << 'EOF' > ~/todo-api/config/appsettings.Production.json
+          ${{ secrets.APPSETTINGS_JSON }}
+          EOF
+          chmod 600 ~/todo-api/config/appsettings.Production.json
+
+      - name: Pull and restart todo-api
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker pull $DOCKERHUB_USERNAME/todo-api:dev
+          docker rm -f todo-api || true
+          docker run -d \
+            --name todo-api \
+            --network todo-net \
+            --restart unless-stopped \
+            -p 5184:8080 \
+            -e ASPNETCORE_ENVIRONMENT=Production \
+            -v ~/todo-api/config/appsettings.Production.json:/app/appsettings.Production.json:ro \
+            $DOCKERHUB_USERNAME/todo-api:dev

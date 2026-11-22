@@ -68,3 +68,23 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/todo-web:${{ github.sha }}
             ${{ secrets.DOCKERHUB_USERNAME }}/todo-web:${{ github.ref_name }}      
+  
+  deploy:
+    name: Deploy UI to Local Ubuntu
+    runs-on: self-hosted
+    needs: docker
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Pull and restart todo-web
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker pull $DOCKERHUB_USERNAME/todo-web:dev
+          docker rm -f todo-web || true
+          docker run -d \
+            --name todo-web \
+            --network todo-net \
+            --restart unless-stopped \
+            -p 4200:80 \
+            $DOCKERHUB_USERNAME/todo-web:dev
