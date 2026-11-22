@@ -1,4 +1,4 @@
-// Mirrors the TaskItem entity returned by the TaskTracker API (API/Lab-01/Data/TaskItem.cs).
+// Mirrors the TaskItem entity returned by the Todo API (API/Lab-01/Data/TaskItem.cs).
 export interface TaskItem {
   id: number;
   title: string;

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { CreateTaskRequest, TaskItem } from './task.model';
 
-// Base URL of the TaskTracker API (the default `dotnet run` / http profile).
+// Base URL of the Todo API (the default `dotnet run` / http profile).
 // Change this if you run the API on a different host or port.
 const API_BASE = 'http://localhost:5184/api/tasks';
 

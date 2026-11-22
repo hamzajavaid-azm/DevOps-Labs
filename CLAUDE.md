@@ -1,11 +1,11 @@
-# Lab-01 — TaskTracker (monorepo)
+# Lab-01 — Todo (monorepo)
 
 A small full-stack to-do app, kept as **one git repository** with two top-level parts:
 
 | Folder        | What it is                        | Stack                                  | Dev URL                 |
 |---------------|-----------------------------------|----------------------------------------|-------------------------|
-| `API/`        | TaskTracker REST API (backend)    | ASP.NET Core (.NET 10) + EF Core + SQL Server | http://localhost:5184   |
-| `UI-Angular/` | TaskTracker web client (frontend) | Angular 21 + Tailwind CSS v4           | http://localhost:4200   |
+| `API/`        | Todo REST API (backend)           | ASP.NET Core (.NET 10) + EF Core + SQL Server | http://localhost:5184   |
+| `UI-Angular/` | Todo web client (frontend)        | Angular 21 + Tailwind CSS v4           | http://localhost:4200   |
 
 Each folder has its **own `CLAUDE.md`** with stack-specific detail — read that before
 working inside it. This file is the shared/global context.

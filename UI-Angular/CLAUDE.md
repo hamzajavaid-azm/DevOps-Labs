@@ -1,7 +1,7 @@
-# UI-Angular — TaskTracker (frontend)
+# UI-Angular — Todo (frontend)
 
 Angular 21 (standalone, signals, zoneless-style) + Tailwind CSS v4 client for the
-TaskTracker API. Part of the Lab-01 monorepo — see the root `CLAUDE.md` for the shared
+Todo API. Part of the Lab-01 monorepo — see the root `CLAUDE.md` for the shared
 API contract and how this connects to the backend.
 
 ## Layout

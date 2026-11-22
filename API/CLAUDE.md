@@ -1,4 +1,4 @@
-# API — TaskTracker (backend)
+# API — Todo (backend)
 
 ASP.NET Core (.NET 10) Web API for the to-do list, backed by SQL Server via EF Core.
 Part of the Lab-01 monorepo — see the root `CLAUDE.md` for how this connects to the

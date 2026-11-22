@@ -30,6 +30,6 @@ describe('App', () => {
     httpMock.expectOne('http://localhost:5184/api/tasks').flush([]);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('TaskTracker');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Todo');
   });
 });

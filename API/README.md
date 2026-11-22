@@ -1,4 +1,4 @@
-# Lab-01 — TaskTracker API
+# Lab-01 — Todo API
 
 A small ASP.NET Core (.NET 10) Web API for a to-do list, backed by SQL Server via
 Entity Framework Core. This part runs **locally**; containerizing it with Docker is
@@ -47,7 +47,7 @@ Uses your local **SQL Server LocalDB** instance — no password, Windows authent
 The connection string lives in `appsettings.Development.json`:
 
 ```
-Server=(localdb)\MSSQLLocalDB;Database=TaskTracker;Trusted_Connection=True;TrustServerCertificate=True
+Server=(localdb)\MSSQLLocalDB;Database=TodoDb;Trusted_Connection=True;TrustServerCertificate=True
 ```
 
 The schema is managed by EF Core migrations. The database is created/updated two ways:
@@ -94,7 +94,7 @@ You can also open `Lab-01/Lab-01.http` in Visual Studio and send each request fr
 
 - **Server name:** `(localdb)\MSSQLLocalDB`
 - **Authentication:** Windows Authentication
-- **Database:** `TaskTracker` → table `dbo.Tasks`
+- **Database:** `TodoDb` → table `dbo.Tasks`
 
 ## Run the tests
 

@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# Multi-stage build for the TaskTracker API (.NET 10).
+# Multi-stage build for the Todo API (.NET 10).
 # Build context is the API/ folder (this directory).
 
 # ---- Stage 1: build & publish ----

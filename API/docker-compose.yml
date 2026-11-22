@@ -1,4 +1,4 @@
-# Runs the TaskTracker API together with a SQL Server instance.
+# Runs the Todo API together with a SQL Server instance.
 #
 #   docker compose up --build
 #
@@ -33,7 +33,7 @@ services:
       ASPNETCORE_ENVIRONMENT: "Production"
       # Connection string is injected at runtime (never hard-coded in the app).
       # "db" is this compose service name, resolved on the compose network.
-      ConnectionStrings__Default: "Server=db,1433;Database=TaskTracker;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
+      ConnectionStrings__Default: "Server=db,1433;Database=TodoDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
     ports:
       # Host 5184 -> container 8080, so the Angular UI's API_BASE keeps working.
       - "5184:8080"

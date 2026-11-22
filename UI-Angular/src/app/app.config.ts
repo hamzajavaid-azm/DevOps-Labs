@@ -8,7 +8,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    // HttpClient is needed by TaskService to call the TaskTracker API.
+    // HttpClient is needed by TaskService to call the Todo API.
     provideHttpClient(withFetch())
   ]
 };
