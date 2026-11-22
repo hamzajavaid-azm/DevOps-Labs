@@ -1,0 +1,36 @@
+name: Backend CI
+
+# Only runs when backend files change (or this workflow itself).
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'API/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [dev]
+    paths:
+      - 'API/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  build:
+    name: Build API (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore API/Lab-01.slnx
+
+      - name: Build
+        run: dotnet build API/Lab-01.slnx --no-restore -c Release
+
+      - name: Test
+        run: dotnet test API/Lab-01.slnx --no-build -c Release --verbosity normal
