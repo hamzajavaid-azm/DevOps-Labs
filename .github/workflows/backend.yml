@@ -81,7 +81,7 @@ jobs:
           cat << 'EOF' > ~/todo-api/config/appsettings.Production.json
           ${{ secrets.APPSETTINGS_JSON }}
           EOF
-          chmod 600 ~/todo-api/config/appsettings.Production.json
+          chmod 644 ~/todo-api/config/appsettings.Production.json
 
       - name: Pull and restart todo-api
         env:
