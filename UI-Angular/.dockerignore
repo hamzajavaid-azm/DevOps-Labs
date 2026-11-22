@@ -1,0 +1,20 @@
+# Keep the Docker build context small and avoid copying host-built artifacts.
+# Paths are relative to the build context (the UI-Angular/ folder).
+
+node_modules
+dist
+.angular
+
+# Git
+.git
+.gitignore
+
+# Editor / tooling
+.vscode
+.editorconfig
+.prettierrc
+
+# Docs & docker files (not needed inside the image)
+*.md
+Dockerfile
+.dockerignore

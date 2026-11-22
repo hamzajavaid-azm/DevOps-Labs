@@ -44,18 +44,17 @@ services:
       db:
         condition: service_healthy
 
-  # --- Frontend (add later) ---
-  # Once UI-Angular has its own Dockerfile (e.g. nginx serving the built app),
-  # uncomment this to run the whole stack with one `docker compose up`.
-  #
-  # web:
-  #   build:
-  #     context: ./UI-Angular
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "4200:80"
-  #   depends_on:
-  #     - api
+  # --- Frontend: Angular UI served by nginx ---
+  web:
+    build:
+      context: ./UI-Angular
+      dockerfile: Dockerfile
+    ports:
+      # Host 4200 -> nginx port 80. The browser calls the API at localhost:5184
+      # (API_BASE in task.service.ts); CORS already allows the 4200 origin.
+      - "4200:80"
+    depends_on:
+      - api
 
 volumes:
   mssql-data:
