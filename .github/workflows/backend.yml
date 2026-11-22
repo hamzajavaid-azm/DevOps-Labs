@@ -29,6 +29,9 @@ jobs:
       - name: Restore
         run: dotnet restore API/Lab-01.slnx
 
+      - name: Lint (dotnet format)
+        run: dotnet format API/Lab-01.slnx --verify-no-changes --severity warn
+
       - name: Build
         run: dotnet build API/Lab-01.slnx --no-restore -c Release
 
