@@ -1,0 +1,53 @@
+name: CI
+
+# Build the whole stack whenever code is pushed to `dev` or a PR targets `dev`.
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  backend:
+    name: Build API (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore API/Lab-01.slnx
+
+      - name: Build
+        run: dotnet build API/Lab-01.slnx --no-restore -c Release
+
+      - name: Test
+        run: dotnet test API/Lab-01.slnx --no-build -c Release --verbosity normal
+
+  frontend:
+    name: Build UI (Angular)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: UI-Angular
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: UI-Angular/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
