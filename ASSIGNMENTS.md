@@ -6,7 +6,7 @@ gap is closed or the pipeline changes. (Operational docs — how to run, deploy,
 live in [`README.md`](./README.md).)
 
 - **Status legend:** ✅ Done · 🟡 Partly done · ❌ Not done · ❓ Cannot verify from here
-- **Last audited:** 2026-11-23 (branch `dev`)
+- **Last audited:** 2026-11-23 (branch `dev`) · **Last updated:** 2026-11-23 (added Slack `notify` job)
 - **Note:** items marked ❓ need the GitHub side (run history, branch protection, registry
   contents) — verify them in the GitHub UI or with the `gh` CLI.
 
@@ -35,7 +35,7 @@ live in [`README.md`](./README.md).)
 | 2.3 | Build step + lint step that must pass | ✅ | backend: `dotnet format` + build; frontend: `npm run lint` (ESLint) + `npm run build` |
 | 2.4 | DB migrations run as a step where needed | 🟡 | No CI migrate step; API auto-migrates on startup (`Database.MigrateAsync`) |
 | 2.5 | Push to dev builds + pushes image | ✅ | `docker` job, `if: push && ref==dev`, tags `:sha` + `:dev` |
-| 2.6 | Slack notification when pipeline finishes | ❌ | No notification step in either workflow |
+| 2.6 | Slack notification when pipeline finishes | ✅ | `notify` job in `backend.yml` + `frontend.yml` (`if: always()`, posts ✅/❌ to Slack via `SLACK_WEBHOOK_URL`). Needs the `SLACK_WEBHOOK_URL` secret set in GitHub. |
 | 2.7 | Workflow is a required status check | ❓ | Branch protection not checkable here; also mind the `paths:`-filter + required-check trap |
 
 ---
