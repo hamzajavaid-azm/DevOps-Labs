@@ -61,9 +61,12 @@ docker compose up --build
 
 - `db` — SQL Server 2022 (data persists in the `mssql-data` volume).
 - `api` — built from `API/Dockerfile`, served on http://localhost:5184.
-- The Angular UI will be added as a `web` service later (there's a commented stub in the
-  compose file). For now run the UI with `npm start` as above.
+- `web` — the Angular UI, built from `UI-Angular/Dockerfile` (nginx), served on
+  http://localhost:4200.
 - `.env` / `.env.example` also live at the root (that's where compose reads them).
+
+The full pipeline, deploy, and rollback are documented in the root `README.md`; the
+assignment status is tracked in `ASSIGNMENTS.md` (see Conventions below).
 
 ## Conventions
 
@@ -71,3 +74,27 @@ docker compose up --build
 - Backend validation (title required, ≤ 100 chars) lives in
   `API/Lab-01/Validation/TaskValidator.cs` and is the authority; the UI mirrors the
   `maxlength` for UX but trusts the API's 400 response for the real error message.
+
+### Documentation — keep these living docs in sync
+
+Two root docs must be kept up to date **in the same change** that alters the thing they
+describe. Do not let them drift.
+
+- **`README.md`** — the operational doc: architecture, how to run (local + Docker), the
+  CI/CD pipeline, staging deploy, rollback, and required secrets. **Update it whenever you
+  change** any Dockerfile / `.dockerignore` / `docker-compose.yml`, any
+  `.github/workflows/*.yml` (jobs, triggers, secrets, deploy, notifications), the deploy
+  target/environment/runner, or the rollback procedure.
+- **`ASSIGNMENTS.md`** — the assignment tracker: one row per assignment task with a status
+  (✅ / 🟡 / ❌ / ❓) and exact evidence, plus the Gate 2 checklist and the open-gaps list.
+  **Update the relevant row's status + evidence whenever a gap is closed** or a task's
+  state changes, and keep the "next actions" list current.
+
+When a change affects both (e.g. adding a Slack step closes an assignment gap *and*
+changes the pipeline), update both files together.
+
+A project hook helps enforce this: `.claude/settings.json` registers a
+`PostToolUse(Write|Edit)` hook (`.claude/hooks/remind-update-trackers.sh`) that, whenever
+a file under `API/`, `UI-Angular/`, or `.github/workflows/` is edited, injects a reminder
+to update the README status tracker and `ASSIGNMENTS.md`. It only nudges — it never blocks
+an edit, and it only fires when Claude is the one editing. Manage it via `/hooks`.

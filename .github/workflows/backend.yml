@@ -1,0 +1,128 @@
+name: Backend CI
+
+# Only runs when backend files change (or this workflow itself).
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'API/**'
+      - '.github/workflows/backend.yml'
+  pull_request:
+    branches: [dev]
+    paths:
+      - 'API/**'
+      - '.github/workflows/backend.yml'
+
+jobs:
+  build:
+    name: Build API (.NET)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore API/Lab-01.slnx
+
+      - name: Lint (dotnet format)
+        run: dotnet format API/Lab-01.slnx --verify-no-changes --severity warn
+
+      - name: Build
+        run: dotnet build API/Lab-01.slnx --no-restore -c Release
+
+      - name: Test
+        run: dotnet test API/Lab-01.slnx --no-build -c Release --verbosity normal
+
+  docker:
+    name: Build and Push API Image
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./API
+          file: ./API/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:${{ github.ref_name }}      
+ 
+  deploy:
+    name: Deploy API to Local Ubuntu
+    runs-on: self-hosted
+    needs: docker
+    environment: development
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Write appsettings.Production.json from Secret
+        run: |
+          mkdir -p ~/todo-api/config
+          cat << 'EOF' > ~/todo-api/config/appsettings.Production.json
+          ${{ secrets.APPSETTINGS_JSON }}
+          EOF
+          chmod 644 ~/todo-api/config/appsettings.Production.json
+
+      - name: Pull and restart todo-api
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          docker pull $DOCKERHUB_USERNAME/todo-api:dev
+          docker rm -f todo-api || true
+          docker run -d \
+            --name todo-api \
+            --network todo-net \
+            --restart unless-stopped \
+            -p 5184:8080 \
+            -e ASPNETCORE_ENVIRONMENT=Production \
+            -v ~/todo-api/config/appsettings.Production.json:/app/appsettings.Production.json:ro \
+            $DOCKERHUB_USERNAME/todo-api:dev
+
+  notify:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    needs: [build, docker, deploy]
+    if: always()   # fire on success AND failure, so any error reaches Slack
+    steps:
+      - name: Send pipeline result to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          # No-op (don't fail the run) if the webhook secret isn't configured yet.
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL not set — skipping Slack notification."
+            exit 0
+          fi
+          # Overall result: FAILED if any needed job failed/was cancelled, else SUCCEEDED
+          # (skipped jobs on a PR count as success).
+          if ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}; then
+            STATUS="❌ FAILED"
+          else
+            STATUS="✅ SUCCEEDED"
+          fi
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          TEXT=$(printf '*Backend CI* %s\n*Branch:* `%s`  •  *Commit:* `%s`\n*By:* %s\n<%s|View run>' \
+            "$STATUS" "${{ github.ref_name }}" "${GITHUB_SHA::7}" "${{ github.actor }}" "$RUN_URL")
+          # jq builds safe JSON (ubuntu-latest ships jq); curl -f fails the step on a non-2xx.
+          jq -n --arg text "$TEXT" '{text: $text}' \
+            | curl -sf -X POST -H 'Content-type: application/json' -d @- "$SLACK_WEBHOOK_URL"
